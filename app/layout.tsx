@@ -37,9 +37,10 @@ export default function RootLayout({
       className={`${playfair.variable} ${inter.variable} ${spaceGrotesk.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <Navbar />
-        <main className="flex-1">{children}</main>
-        <Footer />
+        <Providers>
+          <SiteChrome>{children}</SiteChrome>
+          <Toaster richColors position="top-right" />
+        </Providers>
       </body>
     </html>
   );

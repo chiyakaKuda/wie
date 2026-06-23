@@ -1,133 +1,196 @@
-import { PrismaClient } from "../lib/generated/prisma/client";
-import { PrismaNeon } from "@prisma/adapter-neon";
+import bcrypt from "bcryptjs";
+import { prisma } from "../lib/prisma";
 
-const adapter = new PrismaNeon({ connectionString: process.env.DATABASE_URL });
-const prisma = new PrismaClient({ adapter });
+const PASSWORD_HASH = async (pw: string) => await bcrypt.hash(pw, 10);
 
 async function main() {
+  console.log("Seeding database...");
+
+  // Clear existing data
+  await prisma.eventRSVP.deleteMany();
   await prisma.event.deleteMany();
   await prisma.newsArticle.deleteMany();
+  await prisma.user.deleteMany();
 
-  await prisma.event.createMany({
-    data: [
-      {
-        title: "WiEZ Annual Gala 2026",
-        description:
-          "An evening celebrating the achievements of women engineers across Zimbabwe, with awards for Engineer of the Year and Rising Star.",
-        date: new Date("2026-08-15T18:00:00Z"),
-        location: "Harare",
-        type: "Networking",
-        isPast: false,
-      },
-      {
-        title: "Structural Engineering Workshop",
-        description:
-          "A hands-on technical workshop on modern structural design software, hosted with the Civil Engineering faculty at NUST.",
-        date: new Date("2026-07-22T09:00:00Z"),
-        location: "Bulawayo",
-        type: "Workshop",
-        isPast: false,
-      },
-      {
-        title: "Women in Renewable Energy Conference",
-        description:
-          "Regional conference bringing together engineers, policymakers, and energy companies to discuss Zimbabwe's renewable energy future.",
-        date: new Date("2026-09-10T08:30:00Z"),
-        location: "Mutare",
-        type: "Conference",
-        isPast: false,
-      },
-      {
-        title: "Mentorship Matching Mixer",
-        description:
-          "Speed-mentoring session pairing final-year engineering students with industry mentors from across Mashonaland.",
-        date: new Date("2026-03-05T17:00:00Z"),
-        location: "Harare",
-        type: "Networking",
-        isPast: true,
-      },
-      {
-        title: "Girls in Engineering Seminar",
-        description:
-          "Outreach seminar inspiring secondary school girls in Masvingo Province to pursue engineering careers.",
-        date: new Date("2026-02-14T10:00:00Z"),
-        location: "Masvingo",
-        type: "Seminar",
-        isPast: true,
-      },
-      {
-        title: "Mining Engineering Site Tour & Workshop",
-        description:
-          "A technical site visit and safety workshop for members working in the mining sector, hosted in the Midlands.",
-        date: new Date("2026-01-28T09:00:00Z"),
-        location: "Gweru",
-        type: "Workshop",
-        isPast: true,
-      },
-    ],
+  // Create admin user
+  const adminPassword = await PASSWORD_HASH("Admin@WiEZ2025");
+  const admin = await prisma.user.create({
+    data: {
+      name: "Admin User",
+      email: "admin@wiez.org.zw",
+      password: adminPassword,
+      role: "ADMIN",
+      memberStatus: "ACTIVE",
+    },
+  });
+  console.log("✓ Admin user created");
+
+  // Create active members
+  const memberPassword = await PASSWORD_HASH("Member@WiEZ2025");
+  const member1 = await prisma.user.create({
+    data: {
+      name: "Rumbidzai Chari",
+      email: "rumbidzai@example.com",
+      password: memberPassword,
+      phone: "+263 77 123 4567",
+      province: "Harare",
+      discipline: "Civil Engineering",
+      membershipType: "Full Member",
+      role: "MEMBER",
+      memberStatus: "ACTIVE",
+    },
   });
 
-  await prisma.newsArticle.createMany({
-    data: [
-      {
-        title: "WiEZ Partners with ZINARA to Mentor Female Road Engineers",
-        slug: "wiez-partners-zinara-mentor-female-road-engineers",
-        excerpt:
-          "A new partnership with the Zimbabwe National Road Administration will place 20 female civil engineers into a year-long mentorship pipeline.",
-        content:
-          "Women in Engineering Zimbabwe has signed a memorandum of understanding with the Zimbabwe National Road Administration (ZINARA) to mentor twenty female civil engineers over the next year. The program pairs participants with senior road engineers across Harare, Bulawayo, and Mutare, focusing on pavement design, project supervision, and contract management. WiEZ President noted that the partnership reflects a broader push to close the gender gap in infrastructure leadership roles across Zimbabwe.",
-        category: "Partnerships",
-        author: "WiEZ Communications",
-        publishedAt: new Date("2026-05-12T08:00:00Z"),
-      },
-      {
-        title: "Scholarship Fund Awards Ten New Grants for 2026",
-        slug: "scholarship-fund-awards-ten-new-grants-2026",
-        excerpt:
-          "The WiEZ Scholarship Fund has awarded ten new grants to undergraduate engineering students across six provinces.",
-        content:
-          "The WiEZ Scholarship Fund Committee announced ten new grant recipients for the 2026 academic year, drawn from applicants studying at the University of Zimbabwe, NUST, HIT, and Chinhoyi University of Technology. Recipients span civil, electrical, mining, and chemical engineering disciplines. Each grant covers tuition and a stipend for textbooks and equipment, funded through corporate sponsorships and member contributions.",
-        category: "Scholarships",
-        author: "Tendai Moyo",
-        publishedAt: new Date("2026-04-03T08:00:00Z"),
-      },
-      {
-        title: "Leadership Academy Graduates First Cohort in Bulawayo",
-        slug: "leadership-academy-graduates-first-cohort-bulawayo",
-        excerpt:
-          "Fifteen mid-career engineers completed the inaugural WiEZ Leadership Academy, a six-month program on technical leadership and negotiation.",
-        content:
-          "The first cohort of the WiEZ Leadership Academy graduated in Bulawayo this month, marking the completion of a six-month curriculum covering technical leadership, negotiation, and project governance. Graduates included engineers from the mining, manufacturing, and utilities sectors. WiEZ plans to expand the Academy to Harare and Mutare in the coming year.",
-        category: "Programs",
-        author: "Rutendo Chikafu",
-        publishedAt: new Date("2026-03-20T08:00:00Z"),
-      },
-      {
-        title: "Research Grant Funds Study on Solar Mini-Grids in Manicaland",
-        slug: "research-grant-solar-mini-grids-manicaland",
-        excerpt:
-          "A WiEZ-funded research project will study the feasibility of solar mini-grids for rural communities in Manicaland Province.",
-        content:
-          "Dr. Chiedza Ndlovu, an electrical engineer based in Mutare, has received a WiEZ Research Grant to study the feasibility of solar mini-grid deployment for rural communities in Manicaland Province. The eighteen-month study will assess technical and financial models for community-owned renewable energy infrastructure, with findings to be shared with the Rural Electrification Agency.",
-        category: "Research",
-        author: "WiEZ Communications",
-        publishedAt: new Date("2026-02-18T08:00:00Z"),
-      },
-      {
-        title: "WiEZ Hosts Career Fair for Engineering Graduates in Harare",
-        slug: "wiez-career-fair-engineering-graduates-harare",
-        excerpt:
-          "Over 300 graduating engineering students attended the WiEZ Career Fair, connecting with employers from across Zimbabwe's industrial sector.",
-        content:
-          "More than 300 graduating engineering students attended the annual WiEZ Career Fair at the University of Zimbabwe, connecting with employers spanning construction, mining, telecommunications, and manufacturing. The fair included on-the-spot interviews, CV clinics, and a panel discussion on navigating the first five years of an engineering career.",
-        category: "Events",
-        author: "Farai Gumbo",
-        publishedAt: new Date("2026-01-15T08:00:00Z"),
-      },
-    ],
+  const member2 = await prisma.user.create({
+    data: {
+      name: "Nyasha Mutize",
+      email: "nyasha@example.com",
+      password: memberPassword,
+      phone: "+263 78 234 5678",
+      province: "Bulawayo",
+      discipline: "Electrical Engineering",
+      membershipType: "Full Member",
+      role: "MEMBER",
+      memberStatus: "ACTIVE",
+    },
   });
 
-  console.log("Seed data created.");
+  const member3 = await prisma.user.create({
+    data: {
+      name: "Tariro Zinyemba",
+      email: "tariro@example.com",
+      password: memberPassword,
+      phone: "+263 77 345 6789",
+      province: "Gweru",
+      discipline: "Mining Engineering",
+      membershipType: "Associate",
+      role: "MEMBER",
+      memberStatus: "ACTIVE",
+    },
+  });
+  console.log("✓ Active members created");
+
+  // Create pending applications
+  const pendingPassword = await PASSWORD_HASH("Pending@WiEZ2025");
+  const pending1 = await prisma.user.create({
+    data: {
+      name: "Chiedza Mhangami",
+      email: "chiedza@example.com",
+      password: pendingPassword,
+      phone: "+263 77 456 7890",
+      province: "Harare",
+      discipline: "Mechanical Engineering",
+      membershipType: "Student",
+      role: "MEMBER",
+      memberStatus: "PENDING",
+    },
+  });
+
+  const pending2 = await prisma.user.create({
+    data: {
+      name: "Thandeka Mhlongo",
+      email: "thandeka@example.com",
+      password: pendingPassword,
+      phone: "+263 78 567 8901",
+      province: "Manicaland",
+      discipline: "Software Engineering",
+      membershipType: "Associate",
+      role: "MEMBER",
+      memberStatus: "PENDING",
+    },
+  });
+  console.log("✓ Pending applications created");
+
+  // Create events
+  const now = new Date();
+  const upcoming1 = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+  const upcoming2 = new Date(now.getTime() + 60 * 24 * 60 * 60 * 1000);
+  const past1 = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+  const event1 = await prisma.event.create({
+    data: {
+      title: "Women in Engineering Workshop",
+      description: "A workshop for all levels of female engineers to network and learn.",
+      date: upcoming1,
+      location: "Harare Innovation Hub",
+      province: "Harare",
+      type: "Workshop",
+      capacity: 50,
+      isPublished: true,
+      isPast: false,
+    },
+  });
+
+  const event2 = await prisma.event.create({
+    data: {
+      title: "Annual Gala Dinner",
+      description: "Celebrating women in engineering across Zimbabwe.",
+      date: upcoming2,
+      location: "Sheraton Harare",
+      province: "Harare",
+      type: "Conference",
+      capacity: 200,
+      isPublished: true,
+      isPast: false,
+    },
+  });
+
+  const event3 = await prisma.event.create({
+    data: {
+      title: "Leadership Training",
+      description: "Training for aspiring female engineering leaders.",
+      date: past1,
+      location: "Zoom",
+      province: "Harare",
+      type: "Workshop",
+      isPublished: true,
+      isPast: true,
+    },
+  });
+  console.log("✓ Events created");
+
+  // Create RSVPs
+  await prisma.eventRSVP.create({
+    data: { userId: member1.id, eventId: event1.id, status: "CONFIRMED" },
+  });
+  await prisma.eventRSVP.create({
+    data: { userId: member2.id, eventId: event2.id, status: "CONFIRMED" },
+  });
+  await prisma.eventRSVP.create({
+    data: { userId: member3.id, eventId: event1.id, status: "CONFIRMED" },
+  });
+  await prisma.eventRSVP.create({
+    data: { userId: member1.id, eventId: event3.id, status: "CONFIRMED" },
+  });
+  console.log("✓ RSVPs created");
+
+  // Create news articles
+  await prisma.newsArticle.create({
+    data: {
+      title: "Breaking the Glass Ceiling: Women Engineers Lead",
+      slug: "women-engineers-lead",
+      excerpt: "Discover how WiEZ members are shaping Zimbabwe's engineering future.",
+      content: "Full article content here...",
+      category: "Success Stories",
+      author: "Admin",
+      publishedAt: new Date(),
+    },
+  });
+
+  await prisma.newsArticle.create({
+    data: {
+      title: "Scholarship Fund Expands to 50 Recipients",
+      slug: "scholarship-fund-expands",
+      excerpt: "WiEZ announces record scholarship distribution for 2025.",
+      content: "Full article content here...",
+      category: "Announcements",
+      author: "Admin",
+      publishedAt: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000),
+    },
+  });
+  console.log("✓ News articles created");
+
+  console.log("\n✅ Database seeded successfully!");
 }
 
 main()

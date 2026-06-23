@@ -1,7 +1,7 @@
-import { MapPin, ExternalLink } from "lucide-react";
+import { MapPin } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import AnimatedButton from "@/components/ui/AnimatedButton";
+import RSVPButton from "@/components/RSVPButton";
 
 export type EventCardData = {
   id: string;
@@ -11,12 +11,18 @@ export type EventCardData = {
   location: string;
   type: string;
   isPast: boolean;
+  capacity?: number | null;
+  _count?: { rsvps: number };
 };
 
 export default function EventCard({ event }: { event: EventCardData }) {
   const date = new Date(event.date);
   const month = date.toLocaleDateString("en-GB", { month: "short" });
   const day = date.toLocaleDateString("en-GB", { day: "2-digit" });
+
+  const confirmedCount = event._count?.rsvps ?? 0;
+  const spotsLeft = event.capacity != null ? event.capacity - confirmedCount : null;
+  const isFull = spotsLeft != null && spotsLeft <= 0;
 
   return (
     <Card className="overflow-hidden border-l-4 border-l-transparent hover:border-l-primary transition-colors shadow-sm hover:shadow-md">
@@ -26,11 +32,16 @@ export default function EventCard({ event }: { event: EventCardData }) {
           <span className="font-heading text-xl font-bold leading-none">{day}</span>
         </div>
         <div className="flex-1">
-          <div className="flex items-center gap-2 mb-1">
+          <div className="flex items-center gap-2 mb-1 flex-wrap">
             <Badge variant="secondary" className="text-primary-dark">
               {event.type}
             </Badge>
             {event.isPast && <Badge variant="outline">Past</Badge>}
+            {!event.isPast && spotsLeft != null && (
+              <Badge className={isFull ? "bg-red-100 text-red-700" : "bg-accent text-accent-foreground"}>
+                {isFull ? "Full" : `${spotsLeft} spots left`}
+              </Badge>
+            )}
           </div>
           <h3 className="font-heading text-lg font-semibold text-primary-dark">
             {event.title}
@@ -39,15 +50,7 @@ export default function EventCard({ event }: { event: EventCardData }) {
             <MapPin size={14} /> {event.location}
           </p>
           <p className="text-sm text-text/80 mt-2">{event.description}</p>
-          {!event.isPast && (
-            <AnimatedButton
-              size="sm"
-              icon={ExternalLink}
-              className="mt-4 bg-primary text-white hover:bg-primary-dark hover:text-white"
-            >
-              RSVP
-            </AnimatedButton>
-          )}
+          {!event.isPast && <RSVPButton eventId={event.id} isFull={isFull} />}
         </div>
       </CardContent>
     </Card>

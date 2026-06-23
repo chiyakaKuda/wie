@@ -1,7 +1,12 @@
 import { prisma } from "@/lib/prisma";
 
 export async function getEvents() {
-  return prisma.event.findMany({ orderBy: { date: "asc" } });
+  return prisma.event.findMany({
+    orderBy: { date: "asc" },
+    include: {
+      _count: { select: { rsvps: { where: { status: "CONFIRMED" } } } },
+    },
+  });
 }
 
 export async function getNewsArticles() {
