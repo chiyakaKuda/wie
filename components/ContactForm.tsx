@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { Send } from "lucide-react";
+import AnimatedButton from "@/components/ui/AnimatedButton";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -83,14 +84,16 @@ export default function ContactForm() {
         </p>
       )}
 
-      <Button
+      <AnimatedButton
+        type="button"
         onClick={handleSubmit}
-        disabled={status === "submitting"}
+        loading={status === "submitting"}
+        icon={Send}
         size="lg"
-        className="bg-primary hover:bg-primary-dark text-white w-full sm:w-auto justify-self-start"
+        className="bg-primary text-white hover:bg-primary-dark hover:text-white w-full sm:w-auto justify-self-start"
       >
         {status === "submitting" ? "Sending..." : "Send Message"}
-      </Button>
+      </AnimatedButton>
     </div>
   );
 }

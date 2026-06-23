@@ -1,6 +1,6 @@
 import type { LucideIcon } from "lucide-react";
-import Link from "next/link";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import AnimatedButton from "@/components/ui/AnimatedButton";
 
 type ProgramCardProps = {
   icon: LucideIcon;
@@ -35,12 +35,9 @@ export default function ProgramCard({
             {eligibility}
           </p>
         )}
-        <Link
-          href={href}
-          className="inline-block mt-4 text-sm font-accent uppercase tracking-wide text-primary hover:text-accent transition-colors"
-        >
-          {ctaLabel} →
-        </Link>
+        <AnimatedButton href={href} variant="ghost" className="mt-4">
+          {ctaLabel}
+        </AnimatedButton>
       </CardContent>
     </Card>
   );

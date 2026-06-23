@@ -1,7 +1,7 @@
-import { MapPin } from "lucide-react";
+import { MapPin, ExternalLink } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import AnimatedButton from "@/components/ui/AnimatedButton";
 
 export type EventCardData = {
   id: string;
@@ -40,12 +40,13 @@ export default function EventCard({ event }: { event: EventCardData }) {
           </p>
           <p className="text-sm text-text/80 mt-2">{event.description}</p>
           {!event.isPast && (
-            <Button
+            <AnimatedButton
               size="sm"
-              className="mt-4 bg-primary hover:bg-primary-dark text-white"
+              icon={ExternalLink}
+              className="mt-4 bg-primary text-white hover:bg-primary-dark hover:text-white"
             >
               RSVP
-            </Button>
+            </AnimatedButton>
           )}
         </div>
       </CardContent>

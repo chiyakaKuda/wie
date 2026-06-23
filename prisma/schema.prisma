@@ -10,15 +10,96 @@ datasource db {
   provider = "postgresql"
 }
 
+enum Role {
+  ADMIN
+  MEMBER
+}
+
+enum MemberStatus {
+  PENDING
+  ACTIVE
+  SUSPENDED
+  EXPIRED
+}
+
+enum RSVPStatus {
+  CONFIRMED
+  CANCELLED
+  WAITLISTED
+}
+
+model User {
+  id             String       @id @default(cuid())
+  email          String       @unique
+  password       String
+  name           String
+  phone          String?
+  province       String?
+  discipline     String?
+  employer       String?
+  role           Role         @default(MEMBER)
+  memberStatus   MemberStatus @default(PENDING)
+  membershipType String?
+  joinedAt       DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  rsvps          EventRSVP[]
+  accounts       Account[]
+  sessions       Session[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
 model Event {
-  id          String   @id @default(cuid())
+  id          String      @id @default(cuid())
   title       String
   description String
   date        DateTime
+  endDate     DateTime?
   location    String
+  province    String      @default("Harare")
   type        String // Workshop | Networking | Conference | Seminar
-  isPast      Boolean  @default(false)
-  createdAt   DateTime @default(now())
+  capacity    Int?
+  imageUrl    String?
+  isPublished Boolean     @default(true)
+  isPast      Boolean     @default(false)
+  createdAt   DateTime    @default(now())
+  rsvps       EventRSVP[]
+}
+
+model EventRSVP {
+  id        String     @id @default(cuid())
+  userId    String
+  eventId   String
+  status    RSVPStatus @default(CONFIRMED)
+  createdAt DateTime   @default(now())
+  user      User       @relation(fields: [userId], references: [id])
+  event     Event      @relation(fields: [eventId], references: [id])
+
+  @@unique([userId, eventId])
 }
 
 model NewsArticle {

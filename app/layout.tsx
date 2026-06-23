@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { Playfair_Display, Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
+import { Toaster } from "@/components/ui/sonner";
+import Providers from "@/app/providers";
+import SiteChrome from "@/components/SiteChrome";
 
 const playfair = Playfair_Display({
   variable: "--font-playfair",

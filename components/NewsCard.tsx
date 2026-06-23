@@ -1,6 +1,7 @@
-import Link from "next/link";
+import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import AnimatedButton from "@/components/ui/AnimatedButton";
 
 export type NewsCardData = {
   slug: string;
@@ -11,6 +12,19 @@ export type NewsCardData = {
   publishedAt: Date | string;
 };
 
+const PHOTOS = [
+  "/images/automation-expert-smart-industrial-factory.jpg",
+  "/images/carpenter-cutting-mdf-board-inside-workshop.jpg",
+  "/images/female-technician-supervising-automated-production-line.jpg",
+  "/images/young-girl-form-construction-worker-with-hard-hat.jpg",
+  "/images/expert-repairs-car-helped-by-lamp-light.jpg",
+];
+
+function photoForSlug(slug: string) {
+  const hash = slug.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  return PHOTOS[hash % PHOTOS.length];
+}
+
 export default function NewsCard({ article }: { article: NewsCardData }) {
   const date = new Date(article.publishedAt).toLocaleDateString("en-GB", {
     year: "numeric",
@@ -20,8 +34,13 @@ export default function NewsCard({ article }: { article: NewsCardData }) {
 
   return (
     <Card className="overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-      <div className="h-40 bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center">
-        <span className="font-heading text-white/40 text-4xl">WiEZ</span>
+      <div className="relative h-40">
+        <Image
+          src={photoForSlug(article.slug)}
+          alt={article.title}
+          fill
+          className="object-cover"
+        />
       </div>
       <CardContent>
         <Badge className="bg-accent text-accent-foreground mb-2">{article.category}</Badge>
@@ -33,12 +52,9 @@ export default function NewsCard({ article }: { article: NewsCardData }) {
           <span>{article.author}</span>
           <span>{date}</span>
         </div>
-        <Link
-          href={`/news/${article.slug}`}
-          className="inline-block mt-3 text-sm font-accent uppercase tracking-wide text-primary hover:text-accent transition-colors"
-        >
-          Read More →
-        </Link>
+        <AnimatedButton href={`/news/${article.slug}`} variant="ghost" className="mt-3">
+          Read More
+        </AnimatedButton>
       </CardContent>
     </Card>
   );

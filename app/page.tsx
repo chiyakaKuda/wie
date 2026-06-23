@@ -1,8 +1,7 @@
-import Link from "next/link";
 import Image from "next/image";
 import { Users, GraduationCap, Wrench } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import StatsBar from "@/components/StatsBar";
+import AnimatedButton from "@/components/ui/AnimatedButton";
+import Hero from "@/components/Hero";
 import ProgramCard from "@/components/ProgramCard";
 import EventCard from "@/components/EventCard";
 import NewsCard from "@/components/NewsCard";
@@ -38,18 +37,21 @@ const TESTIMONIALS = [
       "WiEZ paired me with a mentor who helped me navigate my first site role with confidence. I wouldn't be where I am without this network.",
     name: "Rumbidzai Chari",
     discipline: "Civil Engineer, Harare",
+    photo: "/images/pensive-black-female-engineer-hardhat-standing-warehouse-talking-cellphone-shelves-with-goods-background-copy-space-labor-communication-concept.jpg",
   },
   {
     quote:
       "The Scholarship Fund covered my final year of study. Now I'm giving back by mentoring two students of my own.",
     name: "Nyasha Mutize",
     discipline: "Electrical Engineer, Bulawayo",
+    photo: "/images/woman-wearing-special-industrial-protective-equipment.jpg",
   },
   {
     quote:
       "The Leadership Academy gave me the negotiation skills I needed to step into a project management role.",
     name: "Tariro Zinyemba",
     discipline: "Mining Engineer, Gweru",
+    photo: "/images/african-woman-yellow-jacket-hard-cap.jpg",
   },
 ];
 
@@ -60,54 +62,23 @@ export default async function Home() {
 
   return (
     <>
-      {/* Hero */}
-      <section className="relative bg-primary-dark overflow-hidden">
-        <Image
-          src="/wie-bg.jpg"
-          alt=""
-          fill
-          priority
-          className="object-cover object-center"
-        />
-        <div className="absolute inset-0 bg-primary-dark/55" />
-        <div className="relative min-h-[calc(100vh-5rem)] flex flex-col">
-        <div className="flex-1 max-w-7xl w-full mx-auto px-6 py-20 flex flex-col items-center justify-center text-center">
-          <h1 className="font-heading text-4xl md:text-6xl font-bold text-white leading-tight max-w-4xl mx-auto">
-            Engineering Zimbabwe&apos;s Future{" "}
-            <span className="bg-accent text-accent-foreground px-2">/</span> One
-            Woman at a Time
-          </h1>
-          <p className="text-white/80 text-lg max-w-2xl mx-auto mt-6">
-            A professional network for women engineers across Zimbabwe — from
-            students to industry leaders.
-          </p>
-          <div className="flex flex-wrap justify-center gap-4 mt-10">
-            <Button
-              render={<Link href="/join" />}
-              nativeButton={false}
-              size="lg"
-              className="bg-accent text-accent-foreground hover:bg-accent/90"
-            >
-              Join the Network
-            </Button>
-            <Button
-              render={<Link href="/programs" />}
-              nativeButton={false}
-              size="lg"
-              variant="outline"
-              className="bg-transparent border-white text-white hover:bg-white hover:text-primary-dark"
-            >
-              Our Programs
-            </Button>
-          </div>
-        </div>
-        <StatsBar />
-        </div>
-      </section>
+      <Hero />
 
       {/* About snippet */}
       <section className="bg-white">
         <div className="max-w-7xl mx-auto px-6 py-20 grid md:grid-cols-2 gap-12 items-center">
+          <div className="relative h-80 md:h-[28rem] rounded-2xl overflow-hidden">
+            <Image
+              src="/images/portrait-professional-young-black-woman-civil-engineer-architecture-worker-wearing-hard-hat-safety-working-construction-site-warehouseusing-laptop-work.jpg"
+              alt="A WiEZ member, a civil engineer, on site"
+              fill
+              className="object-cover object-top"
+            />
+            <div className="absolute -bottom-px -right-px bg-accent text-accent-foreground px-4 py-2 rounded-tl-2xl">
+              <Slash className="text-2xl" />
+            </div>
+          </div>
+
           <div>
             <SectionEyebrow>Who We Are</SectionEyebrow>
             <h2 className="font-heading text-3xl font-bold text-primary-dark mb-4">
@@ -121,16 +92,15 @@ export default async function Home() {
               opportunities that help our members thrive in a demanding
               profession.
             </p>
-          </div>
-          <div className="border-l-4 border-primary pl-6">
-            <Slash className="text-3xl" />
-            <p className="font-heading text-xl text-primary-dark italic">
-              &ldquo;WiEZ gave me a community of engineers who understood
-              exactly what I was navigating — and the confidence to lead.&rdquo;
-            </p>
-            <p className="mt-3 text-sm font-accent uppercase tracking-wide text-text/60">
-              Chiedza Mhangami, Mechanical Engineer
-            </p>
+            <div className="mt-8 border-l-4 border-primary pl-6">
+              <p className="font-heading text-xl text-primary-dark italic">
+                &ldquo;WiEZ gave me a community of engineers who understood
+                exactly what I was navigating — and the confidence to lead.&rdquo;
+              </p>
+              <p className="mt-3 text-sm font-accent uppercase tracking-wide text-text/60">
+                Chiedza Mhangami, Mechanical Engineer
+              </p>
+            </div>
           </div>
         </div>
       </section>
@@ -163,13 +133,12 @@ export default async function Home() {
             ))}
           </div>
           <div className="text-center mt-10">
-            <Button
-              render={<Link href="/events" />}
-              nativeButton={false}
-              className="bg-primary hover:bg-primary-dark text-white"
+            <AnimatedButton
+              href="/events"
+              className="bg-primary text-white hover:bg-primary-dark hover:text-white"
             >
               See All Events
-            </Button>
+            </AnimatedButton>
           </div>
         </div>
       </section>

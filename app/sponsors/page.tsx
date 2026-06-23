@@ -1,6 +1,5 @@
-import Link from "next/link";
 import { Check } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import AnimatedButton from "@/components/ui/AnimatedButton";
 import SectionEyebrow from "@/components/SectionEyebrow";
 import SponsorStrip from "@/components/SponsorStrip";
 
@@ -105,14 +104,9 @@ export default function SponsorsPage() {
             Reach out and our partnerships team will help you find the right
             tier for your organisation.
           </p>
-          <Button
-            render={<Link href="/contact" />}
-            nativeButton={false}
-            size="lg"
-            className="bg-accent text-accent-foreground hover:bg-accent/90"
-          >
+          <AnimatedButton href="/contact" size="lg">
             Become a Sponsor
-          </Button>
+          </AnimatedButton>
         </div>
       </section>
     </>
